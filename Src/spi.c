@@ -39,19 +39,21 @@ void spi_init(SPI_Handle_t* handle){
 	handle->pSPIx->CR1 = temp;						//Configuration Upload CR1 Register
 }
 uint8_t veri;
+uint16_t new_data;
 void spi_write(SPI_Handle_t* handle, uint8_t* data, uint32_t len){
 
 	if(handle->config.DataSize == SPI_DATASIZE_8BIT){
 		for(int i= 0; i < len; i++){
 			while(!(handle->pSPIx->SR & (1U<<TXE)));
 				;
+			veri = *(data+i);
 			handle->pSPIx->DR = *(data+i);
 		}
 	}else if(handle->config.DataSize == SPI_DATASIZE_16BIT){
 		for(int i= 0; i < len; i++){
 			while(!(handle->pSPIx->SR & (1U << TXE)))
 				;
-			uint16_t new_data = (*(data + i) << 8) | *(data + i + 1);;
+			new_data = (*(data + i) << 8) | *(data + i + 1);;
 			handle->pSPIx->DR = new_data;
 			i++;
 		}

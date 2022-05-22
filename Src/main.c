@@ -28,10 +28,10 @@ uint8_t gelen_data; //giden_data;
 int main(void)
 {
 	// PA4 -> NSS Pin
-	GPIO_Handle_t gpio_spi_nss_pin;
+	GPIO_Handle_t gpio_spi_nss_pin = {0};
 
-	gpio_spi_nss_pin.pGPIOx = GPIOA;
-	gpio_spi_nss_pin.gpio_pin_config.pin_number = GPIO_PIN_4;
+	gpio_spi_nss_pin.pGPIOx = GPIOE;
+	gpio_spi_nss_pin.gpio_pin_config.pin_number = GPIO_PIN_3;
 	gpio_spi_nss_pin.gpio_pin_config.pin_mode = GPIO_MODE_OUT;
 	gpio_spi_nss_pin.gpio_pin_config.pin_otype = GPIO_OTYPE_PP;
 	gpio_spi_nss_pin.gpio_pin_config.pin_pu_pd = GPIO_PUPD_PU;
@@ -39,7 +39,7 @@ int main(void)
 	gpio_init(&gpio_spi_nss_pin);
 
 	//PA5 -> SCK Pin
-	GPIO_Handle_t gpio_spi_sck_pin;
+	GPIO_Handle_t gpio_spi_sck_pin = {0};
 
 	gpio_spi_sck_pin.pGPIOx = GPIOA;
 	gpio_spi_sck_pin.gpio_pin_config.pin_number = GPIO_PIN_5;
@@ -49,7 +49,7 @@ int main(void)
 	gpio_init(&gpio_spi_sck_pin);
 
 	//PA6 -> MISO
-	GPIO_Handle_t gpio_spi_miso_pin;
+	GPIO_Handle_t gpio_spi_miso_pin = {0};
 
 	gpio_spi_miso_pin.pGPIOx = GPIOA;
 	gpio_spi_miso_pin.gpio_pin_config.pin_number = GPIO_PIN_6;
@@ -59,7 +59,7 @@ int main(void)
 	gpio_init(&gpio_spi_miso_pin);
 
 	//PA7 -> MOSI_PIN
-	GPIO_Handle_t gpio_spi_mosi_pin;
+	GPIO_Handle_t gpio_spi_mosi_pin = {0};
 
 	gpio_spi_mosi_pin.pGPIOx = GPIOA;
 	gpio_spi_mosi_pin.gpio_pin_config.pin_number = GPIO_PIN_7;
@@ -69,10 +69,10 @@ int main(void)
 
 	gpio_init(&gpio_spi_mosi_pin);
 
-	SPI_Handle_t spi_config;
+	SPI_Handle_t spi_config = {0};
 	spi_config.pSPIx = SPI1;
 	spi_config.config.Mode = SPI_MODE_MASTER;
-	spi_config.config.DataSize = SPI_DATASIZE_8BIT;
+	spi_config.config.DataSize = SPI_DATASIZE_16BIT;
 	spi_config.config.CLKPolarity = SPI_POLARITY_LOW;
 	spi_config.config.CLKPhase = SPI_PHASE_1EDGE;
 	spi_config.config.NSS = SPI_SSM_ENABLE;
@@ -83,17 +83,18 @@ int main(void)
 
 	//char giden_data[30] = "Merhaba Dunya ";
 
-	char giden_data[30] = "ABC ";//0x0F;
-	gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 4);
+	uint8_t giden_data = 0x0F;
+	giden_data |= (1U << 7);
+
+	gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 3);
 
 	//usart_disable(&uart_config, DISABLE_TX);
 	while(1)
 	{
-		gpio_spi_nss_pin.pGPIOx->ODR &= ~(1U << 4);
-		spi_write(&spi_config, giden_data, 1);
-		delay(DELAY_SECOND(0.0001));
+		gpio_spi_nss_pin.pGPIOx->ODR &= ~(1U << 3);
+		spi_write(&spi_config, &giden_data, 1);
 		gelen_data = spi_read(&spi_config);
-		gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 4);
+		gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 3);
 		delay(DELAY_SECOND(0.0001));
 	}
 }
