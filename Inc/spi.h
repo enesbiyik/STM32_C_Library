@@ -71,7 +71,8 @@ typedef enum SPI_BR_BITS{RXNE, TXE, CHSIDE, UDR, CRC_ERR, MODF, OVR,\
 	BSY, FRE}SPI_BR_BITS;
 
 void spi_init(SPI_Handle_t* handle);
-void spi_write(SPI_Handle_t* handle, uint8_t* data, uint32_t len);
-uint8_t spi_read(SPI_Handle_t* handle);
+void spi_write(SPI_Handle_t* handle, uint16_t* data, uint32_t len);
+uint8_t spi_read_8_bit(SPI_Handle_t* handle);
+uint16_t spi_read_16_bit(SPI_Handle_t* handle);
 
 #endif /* SPI_H_ */

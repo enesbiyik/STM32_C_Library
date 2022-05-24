@@ -20,10 +20,12 @@
 #include <string.h>
 #include "stm32f407xx_gpio.h"
 #include "utility.h"
-#include "usart.h"
+//#include "usart.h"
 #include "spi.h"
+#include "lis3dsh.h"
 
-uint8_t gelen_data; //giden_data;
+uint8_t gelen_data = 0;
+uint16_t x,y,z; //giden_data;
 
 int main(void)
 {
@@ -71,6 +73,7 @@ int main(void)
 
 	SPI_Handle_t spi_config = {0};
 	spi_config.pSPIx = SPI1;
+	spi_config.config.Direction = SPI_DIRECTION_2LINES;
 	spi_config.config.Mode = SPI_MODE_MASTER;
 	spi_config.config.DataSize = SPI_DATASIZE_16BIT;
 	spi_config.config.CLKPolarity = SPI_POLARITY_LOW;
@@ -81,21 +84,16 @@ int main(void)
 
 	spi_init(&spi_config);
 
-	//char giden_data[30] = "Merhaba Dunya ";
+	gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 3); //Start Communication
 
-	uint8_t giden_data = 0x0F;
-	giden_data |= (1U << 7);
-
-	gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 3);
-
-	//usart_disable(&uart_config, DISABLE_TX);
 	while(1)
 	{
 		gpio_spi_nss_pin.pGPIOx->ODR &= ~(1U << 3);
-		spi_write(&spi_config, &giden_data, 1);
-		gelen_data = spi_read(&spi_config);
+		get_xyz_value(&spi_config, &x, &y, &z);
+
+		//MEMS_SPI_Communicate(&spi_config, MEMS_READ, 0x20, &gelen_data);
 		gpio_spi_nss_pin.pGPIOx->ODR |= (1U << 3);
-		delay(DELAY_SECOND(0.0001));
+		delay(DELAY_SECOND(0.00001));
 	}
 }
 
